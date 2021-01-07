@@ -22,12 +22,20 @@ Convolutional Neural Networks are a commonly used state-of-the-art method for au
 - [x] [AMAN] Data collection video -- Wednesday 11:59PM
 - [x] [ALL] Sending out data collection video & request -- Thursday 11:59PM
 - [x] [ALICE] Model creation -- Saturday 11:59PM
-- [ ] [AMAN] Comment Model -- Sunday 11:59PM
+- [x] [AMAN] Comment Model -- Sunday 11:59PM
 - [x] [ADAM] Grid search hyperparameter hunt -- Wednesday November 18 11:59PM
 - [x] [ALICE] Comment + Proofread hyperparameter hunt -- Friday November 20 11:59PM
 - [x] [ADAM] Final model testing 💕 -- Monday November 23 11:59PM
 - [x] [ALICE] Final results presentation -- Monday November 23 11:59PM
-- [ ] [ALL] Complete slides + presentation rehearsal
+- [x] [ALL] Complete slides + presentation rehearsal
+---
+Paper Todos:
+- [ ] [ALICE] Re-do the training process with a person-by-person split instead of random sampling of the full dataset.
+- [ ] [ADAM] Get the bot to achieve the same test/validation/training accuracy as the model in the Jupyter Notebook.
+- [ ] [AMAN] Write the first draft of the paper. 
+- [ ] [ALL] Group Meeting: Monday, Jan 11, 2021.
+- [ ] [ALL] Review paper + incorporate new work.
+- [ ] [AMAN] Get feedback from Steve. 
 
 
 ## Overall Project Architecture
