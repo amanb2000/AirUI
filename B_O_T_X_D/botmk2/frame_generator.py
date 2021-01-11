@@ -92,9 +92,9 @@ class CNN(nn.Module):
     return x
 
 # Get model
-model = torch.load('mdl.pt')
-model.eval()
-trans = transforms.Compose([transforms.CenterCrop((100, 65)), transforms.ToTensor(), transforms.Normalize([0.4275, 0.4275, 0.4275], [0.2293, 0.2293, 0.2293])])
+# model = torch.load('mdl.pt')
+# model.eval()
+# trans = transforms.Compose([transforms.CenterCrop((100, 65)), transforms.ToTensor(), transforms.Normalize([0.4275, 0.4275, 0.4275], [0.2293, 0.2293, 0.2293])])
 # trans = transforms.Compose([transforms.ToTensor(), transforms.Normalize([0.4275, 0.4275, 0.4275], [0.2293, 0.2293, 0.2293])])
 
 
@@ -130,25 +130,25 @@ def snufflupugus(spec_in, show_model_input = False):
     return predict
 
 
-def evaluate(model, data_loader, batchNorm):   # used on validation and test set
-  total_corr = 0
-  totalLoss = 0
-  if batchNorm:
-    model.eval()
-  else:
-    model.train()
-  for i, (inputs, labels) in enumerate(data_loader):
-    oneh_labels = oneh_classes[labels]
-    outputs = model(inputs)
-    if str(loss_fnc) == "CrossEntropyLoss()":                # CrossEntropyLoss does not accept one-hot labels
-      loss = loss_fnc(input=outputs, target=labels) 
-    else: 
-      loss = loss_fnc(input=outputs, target=oneh_labels) 
-    total_corr += numOfCorrectPredictions(outputs, labels) 
-    totalLoss += loss.item()
-  accuracy = float(total_corr)/len(data_loader.dataset)
-  loss = totalLoss/len(data_loader)
-  return (loss, accuracy)
+# def evaluate(model, data_loader, batchNorm):   # used on validation and test set
+#   total_corr = 0
+#   totalLoss = 0
+#   if batchNorm:
+#     model.eval()
+#   else:
+#     model.train()
+#   for i, (inputs, labels) in enumerate(data_loader):
+#     oneh_labels = oneh_classes[labels]
+#     outputs = model(inputs)
+#     if str(loss_fnc) == "CrossEntropyLoss()":                # CrossEntropyLoss does not accept one-hot labels
+#       loss = loss_fnc(input=outputs, target=labels) 
+#     else: 
+#       loss = loss_fnc(input=outputs, target=oneh_labels) 
+#     total_corr += numOfCorrectPredictions(outputs, labels) 
+#     totalLoss += loss.item()
+#   accuracy = float(total_corr)/len(data_loader.dataset)
+#   loss = totalLoss/len(data_loader)
+#   return (loss, accuracy)
 
 def get_dataloader():
     resizeMethod = "scale"
@@ -223,18 +223,52 @@ def generate_spectrogram(file_path):
 
     wave = (audio[:,0] + audio[:,1])*0.5
 
-    print('Waveform shape: {}'.format(wave.shape))
-    plt.figure(figsize = (10, 3))
-    plt.title('Audio Waveform')
-    plt.plot(wave)
-    plt.savefig('test_outputs/waveform.png', dpi=300)
-    plt.show()
+    # print('Waveform shape: {}'.format(wave.shape))
+    # plt.figure(figsize = (10, 3))
+    # plt.title('Audio Waveform')
+    # plt.plot(wave)
+    # plt.savefig('test_outputs/waveform.png', dpi=300)
+    # plt.show()
 
     filter_banks = librosa.filters.mel(n_fft=2048, sr=FS, n_mels=num_mels)
     mel_spectrogram = librosa.feature.melspectrogram(wave, sr=FS, n_fft=2048, hop_length=512, n_mels=num_mels)
     log_mel_spectrogram = librosa.power_to_db(mel_spectrogram)
 
     plt.imsave('test_outputs/test_spectrogram.png', log_mel_spectrogram, cmap='gray')
+    vimg = cv2.imread('test_outputs/test_spectrogram.png', 1)
+
+    return vimg
+
+def segment_spectrogram(spec_in):
+  specs = []
+
+  for start in range(0, len(spec_in[1])-65, 5):
+    specs.append(spec_in[:,start:start+65])
+
+  return np.array(specs) # return the batch of captures
+
+def frame_visualizer(spec, pred, classes, save=False, show=False, fignum=0):
+  # Splitup the plot space
+  fig, axs = plt.subplots(ncols=2, figsize=(15,5), gridspec_kw={'width_ratios': [3, 1]})
+  fig.suptitle('This is the main title')
+  # Left side will be our probabilities bar graph
+  probabilities = softmax(pred.detach()[0])
+  predicted_class_num = np.argmax(probabilities)
+
+  # axs[0].figure(figsize = (10, 5))
+  axs[0].bar(classes, np.asarray(probabilities)*100)
+  axs[0].set_ylim([0, 100])
+  axs[0].title.set_text('Probabilities of Each Class')
+  # Right side will be our spectrogram
+  # axs[1].figure(figsize= (10, 5))
+  axs[1].imshow(spec, cmap='gray')
+  # Now we're ready to show it off
+  if show:
+    plt.show()
+  if save:
+    plt.savefig('test_outputs/slide_{}.png'.format(fignum))
+  plt.close()
+  return
 
 """
 === FRAME GENERATOR ===
@@ -296,6 +330,7 @@ def generate_frames():
     # Importing and showing image
     image = cv2.imread('test_outputs/test_spectrogram.png', 1) 
     width = image.shape[1]
+    return image
 
 
     skip = 1
@@ -444,6 +479,3 @@ def bot_acc_check():
     for i in range(len(results)):
         print("Accuracy on class {}: {}".format(types[i], results[i]))
         
-def main():
-    bot_acc_check()
-main()

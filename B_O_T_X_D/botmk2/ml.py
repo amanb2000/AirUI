@@ -10,6 +10,8 @@ import torchtext as tt
 from PIL import Image
 import cv2
 
+CLASSES = ['Circle Scratch', 'Fingernail Tap', 'Fingertip Tap', 'Silence', 'Vertical Scratch', 'W Scratch']
+
 # Model Init
 class CNN(nn.Module):
   def __init__(self, input_dims, numOfKernels, numOfNeurons, kernelSize, numOfConvLayers, batchNorm):
