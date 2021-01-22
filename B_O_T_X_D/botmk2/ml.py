@@ -1,14 +1,11 @@
 # Imports
-import spacy as spc
-import pandas as pd
-import math as mt
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchvision.transforms.functional as TF
 import torchvision.transforms as transforms
-import torchtext as tt
 from PIL import Image
-import cv2
+import queue
 
 CLASSES = ['Circle Scratch', 'Fingernail Tap', 'Fingertip Tap', 'Silence', 'Vertical Scratch', 'W Scratch']
 
@@ -62,12 +59,32 @@ class CNN(nn.Module):
       x = self.fc2(x)
     return x
 
+from torch.utils.data import IterableDataset
+
+class MyDataset(IterableDataset):
+    def __init__(self, image_queue, transforms=None):
+      self.queue = image_queue
+      self.transforms = transforms
+
+    def read_next_image(self):
+        while self.queue.qsize() > 0:
+            if self.transforms is not None:
+              # yield self.transforms(self.queue.get())
+              pass
+            # you can add transform here
+            yield self.queue.get()
+        return None
+
+    def __iter__(self):
+        return self.read_next_image()
+
 def snufflupugus(spec_in):
     # Get model
-    model = torch.load('mdl.pt')
+    model = CNN(input_dims=(100, 65), numOfKernels=26, numOfNeurons=100, kernelSize=3, numOfConvLayers=2, batchNorm=True)
+    model.load_state_dict(torch.load('crop_best_dict_nosplit_f.pt'))
     model.eval()
-    trans = transforms.Compose([transforms.CenterCrop((100, 65)), transforms.ToTensor(), transforms.Normalize([0.4275, 0.4275, 0.4275], [0.2293, 0.2293, 0.2293])])
-    im = Image.fromarray(spec_in)
-    clean_scan = trans(im)
+    # trans = transforms.Compose([transforms.ToPILImage(), transforms.CenterCrop((100, 65)), transforms.ToTensor(), transforms.Normalize([0.4275, 0.4275, 0.4275], [0.2293, 0.2293, 0.2293])])
+    # clean_scan = trans(spec_in)
+    clean_scan = spec_in
     predict = model(clean_scan.reshape(1, 3, 100, 65))
     return predict

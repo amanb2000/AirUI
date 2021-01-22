@@ -2,3 +2,9 @@ Full_Dataset/*
 env
 Parameter_Search/data/*
 Parameter_Search/log_*
+B_O_T_X_D/test_output/*
+B_O_T_X_D/*.png
+B_O_T_X_D/data/*
+B_O_T_X_D/dt/*
+B_O_T_X_D/unlabelled/*
+B_O_T_X_D/unlabelled.rar

@@ -250,7 +250,7 @@ def segment_spectrogram(spec_in):
 def frame_visualizer(spec, pred, classes, save=False, show=False, fignum=0):
   # Splitup the plot space
   fig, axs = plt.subplots(ncols=2, figsize=(15,5), gridspec_kw={'width_ratios': [3, 1]})
-  fig.suptitle('This is the main title')
+  fig.suptitle('Circle Scratch Misclassified as Silence Example')
   # Left side will be our probabilities bar graph
   probabilities = softmax(pred.detach()[0])
   predicted_class_num = np.argmax(probabilities)
@@ -266,6 +266,7 @@ def frame_visualizer(spec, pred, classes, save=False, show=False, fignum=0):
   if show:
     plt.show()
   if save:
+    plt.savefig('test_outputs/slide_{}.eps'.format(fignum))
     plt.savefig('test_outputs/slide_{}.png'.format(fignum))
   plt.close()
   return
